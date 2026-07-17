@@ -398,7 +398,7 @@ function showQuestion(index) {
         if (isAnswered) {
             let userAns = userAnswers[index];
             if (userAns.isCorrect) {
-                feedback.innerText = "🎉 Chính xác! Bạn thật xuất sắc.";
+                feedback.innerText = "🎉 Oh Yeah! Bạn thật xuất sắc.";
                 feedback.classList.add('correct');
             } else {
                 feedback.innerText = "😢 Rất tiếc! Đáp án đúng là: " + q.answer;
@@ -454,7 +454,7 @@ function showQuestion(index) {
         if (autoNextEnabled && currentIndex < activeQuestions.length - 1) {
             autoNextTimer = setTimeout(() => {
                 nextQuestion();
-            }, 1000);
+            }, 1500);
         }
     }
 
