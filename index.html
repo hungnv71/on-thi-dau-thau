@@ -105,6 +105,12 @@
         .explanation-box { margin-top: 14px; padding: 14px 18px; border-radius: 12px; background: #f0f4ff; border-left: 5px solid #667eea; font-size: 14px; line-height: 1.6; color: #3c4a6b; }
         .explanation-box b { color: #4c51bf; }
 
+        /* Auto-next */
+        .auto-next-hint { margin-top: 12px; font-size: 13px; font-weight: 800; color: #764ba2; text-align: center; animation: slideDown 0.3s ease; }
+        .auto-next-row { margin-top: 16px; display: flex; justify-content: center; }
+        .auto-next-label { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: #718096; cursor: pointer; }
+        .auto-next-label input[type="checkbox"] { width: 16px; height: 16px; accent-color: #667eea; cursor: pointer; }
+
         @media (max-width: 600px) {
             .header { padding: 20px 15px; }
             .header h1 { font-size: 22px; }
@@ -156,6 +162,14 @@
         
         <div id="feedbackBanner" class="feedback-banner"></div>
         <div id="explanationBox" class="explanation-box" style="display:none;"></div>
+        <div id="autoNextHint" class="auto-next-hint" style="display:none;">⏩ Tự động chuyển câu sau 1 giây...</div>
+
+        <div class="auto-next-row">
+            <label class="auto-next-label">
+                <input type="checkbox" id="autoNextToggle" checked onchange="toggleAutoNext()">
+                Tự động chuyển câu tiếp theo sau 1 giây khi chọn đáp án
+            </label>
+        </div>
         
         <div class="controls">
             <button class="btn btn-prev" onclick="prevQuestion()">
@@ -185,6 +199,12 @@
     let userAnswers = {};
     let activeQuestions = questions;
     let examMode = false;
+    let autoNextEnabled = true;
+    let autoNextTimer = null;
+
+    function toggleAutoNext() {
+        autoNextEnabled = document.getElementById('autoNextToggle').checked;
+    }
 
     function shuffleArray(arr) {
         for (let i = arr.length - 1; i > 0; i--) {
@@ -322,6 +342,7 @@
 
     
 function showQuestion(index) {
+        clearTimeout(autoNextTimer);
         currentIndex = index;
         const q = activeQuestions[index];
         
@@ -393,6 +414,13 @@ function showQuestion(index) {
             explBox.style.display = 'none';
         }
 
+        const hint = document.getElementById('autoNextHint');
+        if (isAnswered && autoNextEnabled && index < activeQuestions.length - 1) {
+            hint.style.display = 'block';
+        } else {
+            hint.style.display = 'none';
+        }
+
         // Update grid active state
         document.querySelectorAll('.q-btn').forEach(b => b.classList.remove('active'));
         document.getElementById('btn-q-' + index).classList.add('active');
@@ -422,6 +450,12 @@ function showQuestion(index) {
 
         // Render again to show colors and feedback
         showQuestion(currentIndex);
+
+        if (autoNextEnabled && currentIndex < activeQuestions.length - 1) {
+            autoNextTimer = setTimeout(() => {
+                nextQuestion();
+            }, 1000);
+        }
     }
 
     function prevQuestion() {
